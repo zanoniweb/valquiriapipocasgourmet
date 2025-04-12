@@ -181,6 +181,9 @@ function loadQuestions() {
        <form class="contact-form" action="https://formsubmit.co/cambeinova@gmail.com" method="POST" autocomplete="off">
 
         <h2>Carrinho</h2>
+
+<div class="form-group">
+
         <table border="1" cellspacing="0" cellpadding="8">
           <thead>
             <tr>
@@ -205,8 +208,11 @@ function loadQuestions() {
           </tbody>
         </table>
         <p><strong>Total: R$ ${total.toFixed(2)}</strong></p>
+</div>
 
         <h3>Dados de Entrega</h3>
+
+<div class="form-group">
 
         <label><b>Nome:</b></label>
         <input type="text" id="nome-cliente" name="nome" required autocomplete="off"><br>
@@ -232,8 +238,10 @@ function loadQuestions() {
         <label><b>CEP:</b></label>
         <input type="text" id="cep" name="cep" required autocomplete="off"><br>
 
+</div>
+
         <h3>Formas de Pagamento</h3>
-        <div>
+  
           <label for="pix">
             <input type="checkbox" id="pix" name="payment-method" value="pix">
             <p><b>PIX:</b> 000.000.000-00</p>
@@ -244,9 +252,11 @@ function loadQuestions() {
           </label>
         </div>
 
+<div class="form-group">
+
         <p id="selected-method"></p>
 
-    
+</div>    
         <button onclick="salvarPDF()">Salvar PDF</button>
 
         <!--O botão enviar e as duas linhas abaixo fazem parte também essencial para encaminhar os dados do formulário para o e-mail do destinatário-->
