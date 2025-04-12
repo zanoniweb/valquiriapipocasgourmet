@@ -171,19 +171,20 @@ function loadQuestions() {
       alert('Produto adicionado ao carrinho!');
     }
 
-    function exibirCarrinho() {
-      const conteudo = document.getElementById('conteudo');
-      let total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+   function exibirCarrinho() {
+  const conteudo = document.getElementById('conteudo');
+  let total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
 
-      conteudo.innerHTML = `
+  // Gerar string com todos os itens do carrinho
+  const dadosProdutos = carrinho.map(item =>
+    `${item.nome} - Quantidade: ${item.quantidade} - Preço: R$ ${item.preco.toFixed(2)}`
+  ).join('\n');
 
-       <!--Esse form class é uma das partes essenciais para encaminhar os dados dos formulário-->
-       <form class="contact-form" action="https://formsubmit.co/julianozanoni2014@gmail.com" method="POST" autocomplete="off">
+  conteudo.innerHTML = `
+    <form class="contact-form" action="https://formsubmit.co/julianozanoni2014@gmail.com" method="POST" autocomplete="off">
+      <h2>Carrinho</h2>
 
-        <h2>Carrinho</h2>
-
-<div class="form-group">
-
+      <div class="form-group">
         <table border="1" cellspacing="0" cellpadding="8">
           <thead>
             <tr>
@@ -200,17 +201,22 @@ function loadQuestions() {
                 <td>${item.preco.toFixed(2)}</td>
                 <td>${item.quantidade}</td>
                 <td>
-                  <button onclick="alterarQuantidade(${index}, 1)">+</button>
-                  <button onclick="alterarQuantidade(${index}, -1)">-</button>
+                  <button type="button" onclick="alterarQuantidade(${index}, 1)">+</button>
+                  <button type="button" onclick="alterarQuantidade(${index}, -1)">-</button>
                 </td>
               </tr>
             `).join('')}
           </tbody>
         </table>
         <p><strong>Total: R$ ${total.toFixed(2)}</strong></p>
-</div>
+      </div>
 
-        <h3>Dados de Entrega</h3>
+      <!-- Adiciona campos ocultos para enviar os dados do carrinho -->
+      
+      <input type="hidden" name="produtos" value="${dadosProdutos}">
+      <input type="hidden" name="valor_total" value="R$ ${total.toFixed(2)}">
+      
+  <h3>Dados de Entrega</h3>
 
 <div class="form-group">
 
