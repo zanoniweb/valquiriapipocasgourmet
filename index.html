@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+  <title>Loja Virtual: Valquiria Pipocas Gourmet</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Loja Virtual: Valquiria Pipocas Gourmet</h1>
+    <nav>
+      <a href="#" id="link-historia">História</a>
+      <a href="#" id="link-loja">Loja</a>
+    </nav>
+  </header>
+
+
+  <main id="conteudo">
+    <!-- Conteúdo será carregado dinamicamente -->
+  </main>
+
+
+  <button id="start-chat-btn">Iniciar Chat</button>
+
+  <div id="chat-box" class="hidden">
+    <div id="chat-header">
+      <span>Chat Interativo</span>
+      <button id="close-chat-btn">Encerrar</button>
+    </div>
+    <div id="chat-content">
+      <p id="welcome-message" class="hidden">Bem-vindo ao nosso chat! Escolha uma pergunta abaixo:</p>
+      <ul id="question-list" class="hidden"></ul>
+      <p id="response" class="hidden"></p>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Loja Virtual desenvolvida por Juliano Zanoni</p>
+  </footer>
+
+  <script>
+
+//COMEÇO DA CODIFICAÇÃO DAS FUNÇÕES DO CHAT
+const questionsAndAnswers = [
+  { question: "Qual é o horário de funcionamento?", answer: "Nosso horário é das 8:30h às 11:30 e das 13:00 até as 18:00h, de segunda a sexta-feira." },
+  { question: "Vocês abrem aos finais de semana?", answer: "Sim, estamos abertos aos sábados das 9h às 12h." },
+  { question: "Como posso entrar em contato?", answer: "Você pode entrar em contato pelo telefone (43) 9999-44331 (Wats)." },
+  { question: "Vocês oferecem entrega?", answer: "Sim, temos opções de entrega para sua comodidade." },
+  { question: "Qual é o endereço da loja?", answer: "Atualmente não temos loja física apenas um ambiente de produção dos produtos artesanais." },
+  { question: "Vocês possuem estacionamento?", answer: "Não, temos estacionamento nesse momento." },
+  { question: "Quais são as formas de pagamento aceitas?", answer: "Aceitamos PIX ou transferência bancária." },
+  { question: "Vocês oferecem descontos?", answer: "Sim, confira nossas promoções no site ou na loja quando forem divulgadas." },
+  { question: "Vocês emitem nota fiscal?", answer: "Sim, emitimos nota fiscal." },
+  { question: "Há garantia nos produtos?", answer: "Sim, oferecemos garantia conforme o fabricante." },
+  { question: "Vocês têm produtos em promoção?", answer: "Sim, temos uma seção de promoções no site e na loja." },
+  { question: "Vocês aceitam encomendas especiais?", answer: "Sim, trabalhamos com encomendas personalizadas." },
+  { question: "Há atendimento online?", answer: "Sim, oferecemos suporte online via e-mail. lojapipocasdavalquria@gamil.com" },
+  { question: "Qual é o prazo de entrega?", answer: "Como realizamos entregas na região de Londrina/Pr e em cidades de sua região metropolitana que são Cambé e Ibiporã a entrega pode ser agendada para o dia e o horário que o cliente combinar para sua festa." },
+  { question: "Vocês fazem atendimentos diretamente nos eventos?", answer: "Sim, temos uma equipe especializada para atuar dentro de eventos." },
+  { question: "Posso reservar produtos?", answer: "Sim, reservas podem ser feitas pelo nosso Wats (43) 9999-44331 ou pelo nosso e-mail comercercial lojapipocasdavalquria@gamil.com." },
+  { question: "Vocês trabalham com produtos em estoque?", answer: "Não, produzimos de forma artesansal especificamente para sua demanda e de fuma forma persoanlizada." },
+  { question: "Vocês têm atendimento para empresas?", answer: "Sim, já prestamos serviços para empresas em eventos." },
+  { question: "Há algum programa de fidelidade?", answer: "Sim, para os nossos clientes fidelizados temos vantagens." },
+  { question: "Posso cancelar um pedido?", answer: "Sim, mas existe um prazo de 24 horas para que isso seja realizado antes que a produção artesanal de sua encomenda comece a ser produzida." },
+];
+
+document.getElementById('start-chat-btn').addEventListener('click', function () {
+  document.getElementById('chat-box').classList.remove('hidden');
+  document.getElementById('chat-box').style.display = 'flex'; // Mostra o chat-box
+  document.getElementById('start-chat-btn').classList.add('hidden'); // Esconde o botão
+  document.getElementById('welcome-message').classList.remove('hidden');
+  loadQuestions();
+});
+
+document.getElementById('close-chat-btn').addEventListener('click', function () {
+  document.getElementById('chat-box').classList.add('hidden');
+  document.getElementById('chat-box').style.display = 'none'; // Esconde o chat-box
+  document.getElementById('start-chat-btn').classList.remove('hidden'); // Mostra o botão
+  document.getElementById('welcome-message').classList.add('hidden');
+  document.getElementById('question-list').classList.add('hidden');
+  document.getElementById('response').classList.add('hidden');
+});
+
+function loadQuestions() {
+  const questionList = document.getElementById('question-list');
+  questionList.innerHTML = ''; // Limpa perguntas existentes
+  questionsAndAnswers.forEach((item, index) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = `${index + 1}. ${item.question}`;
+    listItem.addEventListener('click', () => showResponse(item.answer));
+    questionList.appendChild(listItem);
+  });
+  questionList.classList.remove('hidden');
+}
+
+  function showResponse(answer) {
+    const response = document.getElementById('response');
+    response.textContent = answer;
+    response.classList.remove('hidden');
+  
+    // Realiza a rolagem para a resposta
+    response.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+//FINAL DA CODIFICAÇÃO DAS FUNÇÕES DO CHAT
+
+
+    const produtos = [
+      
+      { id: 1, nome: 'Pipocas 10 g', preco: 10.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a764a277f_pipoca10g.jpg'},
+      { id: 2, nome: 'Pipocas 15 g', preco: 15.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a79ea5a52_pipoca15g.jpg'},
+      { id: 3, nome: 'Pipocas 20 g', preco: 20.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a851dd10d_pipoca20g.jpg'},
+      { id: 4, nome: 'Pipocas 20 g com lapela', preco: 25.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a8b08ff16_pipoca20glapela.jpg'},
+      { id: 5, nome: 'Pipocas 20 g com renda e laço', preco: 25.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a8e3c8375_pipoca20grendaelaco.jpg'},
+      { id: 6, nome: 'Pipocas 20 g com caixinha de papelão com visor', preco: 25.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a9cd13a8d_pipoca20gcaixinhacomvisor.jpg'},
+      { id: 7, nome: 'Pipoca 20 g com bag', preco: 25.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623aa1ca9fb9_pipoca20gbag.jpg'},
+      { id: 8, nome: 'Pipoca 20 g com bosinha', preco: 25.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623aa6763436_pipoca20gbolsinha.jpg'},
+      { id: 9, nome: 'Pipocas 40 g com potinho hermético', preco: 30.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a938f2f09_pipoca40gpotinhohermetico.jpg'},
+      { id: 10, nome: 'Pipocas 40 g com zip lop', preco: 30.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623a98531d98_pipoca40gembalegemziplop.jpg'}, 
+      { id: 11, nome: 'Pipoca 500 g a granel', preco: 150.0, imagem: 'https://d1yei2z3i6k35z.cloudfront.net/6946809/6623aa92e8ec4_pipoca500gagranel.jpg'},
+     
+    ];
+
+    let carrinho = [];
+
+    document.getElementById('link-historia').addEventListener('click', exibirHistoria);
+    document.getElementById('link-loja').addEventListener('click', exibirLoja);
+
+    function exibirHistoria() {
+      const conteudo = document.getElementById('conteudo');
+      conteudo.innerHTML = `
+        <h2>Nossa História</h2>
+        <p>Bem-vindo à nossa loja! Começamos nossa jornada em [ano de fundação] com o objetivo de [missão ou objetivo]. Desde então, temos nos dedicado a oferecer produtos de qualidade e um atendimento excepcional. Obrigado por fazer parte da nossa história!</p>
+      `;
+    }
+
+    function exibirLoja() {
+      const conteudo = document.getElementById('conteudo');
+      conteudo.innerHTML = `
+        <h2>Loja</h2>
+
+        <div id="produtos">
+
+  
+          ${produtos.map(produto => `
+            <div class="produto">
+              <img src="${produto.imagem}" alt="${produto.nome}" width="100">
+              <p>${produto.nome}</p>
+              <p>R$ ${produto.preco.toFixed(2)}</p>
+              <button onclick="adicionarAoCarrinho(${produto.id})">Adicionar ao Carrinho</button>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+          <button onclick="exibirCarrinho()">Ver Carrinho</button>
+        </div>
+      `;
+    }
+
+    function adicionarAoCarrinho(produtoId) {
+      const produto = produtos.find(p => p.id === produtoId);
+      const existente = carrinho.find(item => item.id === produtoId);
+      if (existente) {
+        existente.quantidade = (existente.quantidade || 1) + 1;
+      } else {
+        carrinho.push({ ...produto, quantidade: 1 });
+      }
+      alert('Produto adicionado ao carrinho!');
+    }
+
+    function exibirCarrinho() {
+      const conteudo = document.getElementById('conteudo');
+      let total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+
+      conteudo.innerHTML = `
+
+       <!--Esse form class é uma das partes essenciais para encaminhar os dados dos formulário-->
+      <form class="contact-form" action="https://formsubmit.co/julianozanoni2014@gmail.com" method="POST" autocomplete="off">
+
+
+        <h2>Carrinho</h2>
+        <table border="1" cellspacing="0" cellpadding="8">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Preço (R$)</th>
+              <th>Quantidade</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${carrinho.map((item, index) => `
+              <tr>
+                <td>${item.nome}</td>
+                <td>${item.preco.toFixed(2)}</td>
+                <td>${item.quantidade}</td>
+                <td>
+                  <button onclick="alterarQuantidade(${index}, 1)">+</button>
+                  <button onclick="alterarQuantidade(${index}, -1)">-</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <p><strong>Total: R$ ${total.toFixed(2)}</strong></p>
+
+        <h3>Dados de Entrega</h3>
+        
+        <label><b>Nome:</b></label> <input type="text" id="nome-cliente" required autocomplete="off"><br>
+        
+        <label><b>Telefone de Contato:</b></label>
+        <input type="text"
+        id="telefone"
+        required
+        autocomplete="off"
+        maxlength="11"
+        pattern="[0-9]{10,11}"
+        placeholder="Ex: 11912345678"
+        oninput="this.value = this.value.replace(/[^0-9]/g, '')" required autocomplete="off"><br>
+
+        <label><b>E-mail:</b></label>
+        <input type="email" id="email" required autocomplete="off" placeholder="exemplo@email.com"><br>
+        
+        <label><b>Rua:</b></label> <input type="text" id="rua" required autocomplete="off"><br>
+        
+        <label><b>Número:</b></label> <input type="text" id="numero" required autocomplete="off"><br>
+        
+        <label><b>Bairro:</b></label> <input type="text" id="bairro" required autocomplete="off"><br>
+        
+        <label><b>Cidade:</b></label> <input type="text" id="cidade" required autocomplete="off"><br>
+        
+        <label><b>CEP:</b></label> <input type="text" id="cep" required autocomplete="off"><br>
+
+        <h3>Formas de Pagamento</h3>
+        <div>
+          <label for="pix">
+            <input type="checkbox" id="pix" name="payment-method" value="pix">
+            <p><b>PIX:</b> 000.000.000-00</p>
+          </label>
+          <label for="transfer">
+            <input type="checkbox" id="transfer" name="payment-method" value="transfer">
+            <p><b>Transferência:</b> Banco ?????, Agência ????, Conta ?????-?</p>
+          </label>
+        </div>
+
+        <p id="selected-method"></p>
+
+    
+        <button onclick="salvarPDF()">Salvar PDF</button>
+
+        <!--O botão enviar e as duas linhas abaixo fazem parte também essencial para encaminhar os dados do formulário para o e-mail do destinatário-->
+            <button type="submit">Enviar</button>
+                <input type="hidden" name="_next" value="URL DO SITE EM, QUE A LOJA ESTÁ HOSPEDADA/thanks.html(RESPOSTA TÉNCICA DA LOJA)">
+                <input type="hidden" name="_subject" value="New submission!">
+
+        </form>
+      `;
+    }
+
+    function alterarQuantidade(index, delta) {
+      carrinho[index].quantidade += delta;
+      if (carrinho[index].quantidade <= 0) {
+        carrinho.splice(index, 1);
+      }
+      exibirCarrinho();
+    }
+
+    //COMEÇO DA CODIFICAÇÃO DA SALVA DO CARRINHO
+    
+    async function salvarPDF() {
+  if (carrinho.length === 0) {
+      alert('O carrinho está vazio. Adicione itens antes de salvar.');
+      return;
+  }
+
+  const nomeCliente = document.getElementById('nome-cliente').value.trim();
+  const telefone = document.getElementById('telefone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const rua = document.getElementById('rua').value.trim();
+  const numero = document.getElementById('numero').value.trim();
+  const bairro = document.getElementById('bairro').value.trim();
+  const cidade = document.getElementById('cidade').value.trim();
+  const cep = document.getElementById('cep').value.trim();
+
+  if (!nomeCliente || !rua || !numero || !bairro || !cidade || !cep || !telefone || !email) {
+  alert('Preencha todos os campos de dados, pois eles são obrigatórios.');
+  return;
+}
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 10;
+
+  // Informações do cliente
+  doc.setFontSize(12);
+  doc.text(`Cliente: ${nomeCliente}`, 10, y); y += 10;
+  doc.text(`Endereço: ${rua}, Nº ${numero}`, 10, y); y += 10;
+  doc.text(`Bairro: ${bairro}`, 10, y); y += 10;
+  doc.text(`Cidade: ${cidade} - CEP: ${cep}`, 10, y); y += 10;
+  doc.text(`Telefone: ${telefone}`, 10, y); y += 10;
+  doc.text(`E-mail: ${email}`, 10, y); y += 15;
+
+  // Itens do carrinho
+  doc.setFontSize(14);
+  doc.text(`Carrinho de Compras`, 10, y); y += 10;
+  doc.setFontSize(12);
+  carrinho.forEach((item, index) => {
+      doc.text(`${index + 1}. ${item.nome} - R$ ${item.preco.toFixed(2)} x ${item.quantidade}`, 10, y);
+      y += 8;
+  });
+
+  // Total
+  const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+  y += 5;
+  doc.setFontSize(13);
+  doc.text(`Total: R$ ${total.toFixed(2)}`, 10, y); y += 15;
+
+  // Forma(s) de pagamento
+  const metodosPagamento = [];
+  if (document.getElementById('pix').checked) {
+      metodosPagamento.push("PIX: 000.000.000-00");
+  }
+  if (document.getElementById('transfer').checked) {
+      metodosPagamento.push("Transferência: Banco ?????, Agência ????, Conta ?????-?");
+  }
+
+  if (metodosPagamento.length > 0) {
+      doc.setFontSize(12);
+      doc.text("Forma(s) de Pagamento:", 10, y); y += 10;
+      metodosPagamento.forEach(metodo => {
+          doc.text(`- ${metodo}`, 10, y);
+          y += 8;
+      });
+  } else {
+      doc.text("Forma de Pagamento: Não informada", 10, y); y += 10;
+  }
+
+  // Salvar PDF
+  doc.save(`pedido_${nomeCliente}.pdf`);
+}
+
+//FINAL DA CODIFICAÇÃO DA SALVA DO CARRINHO
+
+  </script>
+</body>
+</html>
